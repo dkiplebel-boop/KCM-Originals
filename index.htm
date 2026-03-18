@@ -255,7 +255,7 @@
                 <div class="reveal reveal-bottom active">
                     <h1 class="classy-font font-black tracking-tighter uppercase mb-4">
                         <span class="brand-giant-text block mb-4">KCM</span>
-                        <span class="gold-gradient-text fit-screen-text italic">ORIGINALS</span>
+                        <span class="gold-gradient-text fit-screen-text italic">Originals</span>
                     </h1>
                 </div>
                 <div class="reveal reveal-bottom active" style="transition-delay: 0.2s">
@@ -318,18 +318,13 @@
         const WHATSAPP = "254704336717";
         const INSTAGRAM = "_darren.kc";
         
-        /**
-         * Updated Products Array
-         * Use 'images' array for JPG/PNG URLs.
-         * Keep 'icons' as fallback for when no images are present.
-         */
         const products = [
             { 
                 id: 1, 
                 name: 'Onyx Black', 
                 price: 400, 
                 color: 'bg-zinc-900', 
-                images: [], // Add URLs here e.g. ["url1.jpg", "url2.jpg"]
+                images: [], 
                 icons: ['🩲', '🖤', '🎱'], 
                 category: 'Signature Series' 
             },
@@ -494,14 +489,30 @@
         function closeCheckout() { document.getElementById('checkout-modal').classList.replace('flex', 'hidden'); }
 
         function checkout(platform) {
-            let msg = "Order from KCM Boutique:\n\n";
+            const total = cart.reduce((s,i) => s + i.price, 0);
             const grouped = cart.reduce((acc, item) => {
                 const key = `${item.name}-${item.size}`;
                 if(!acc[key]) acc[key] = { ...item, count: 0 };
                 acc[key].count++;
                 return acc;
             }, {});
-            Object.values(grouped).forEach(i => msg += `• ${i.name} (${i.size}) x${i.count}\n`);
+
+            let msg = `✨ NEW ORDER: KCM PREMIUM BOUTIQUE\n`;
+            msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+            
+            let i = 1;
+            Object.values(grouped).forEach(item => {
+                msg += `${i}. ITEM: ${item.name.toUpperCase()}\n`;
+                msg += `   SIZE: ${item.size}\n`;
+                msg += `   QTY:  ${item.count}\n`;
+                msg += `   PRICE: KSh ${item.price.toLocaleString()}\n\n`;
+                i++;
+            });
+
+            msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+            msg += `💰 TOTAL AMOUNT: KSh ${total.toLocaleString()}\n\n`;
+            msg += `📝 CUSTOMER NOTE: I'd like to place this order. Please advise on payment and delivery.\n`;
+
             if(platform === 'whatsapp') {
                 window.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
             } else {
