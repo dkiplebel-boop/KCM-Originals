@@ -137,8 +137,33 @@
         #page-curtain { position: fixed; inset: 0; background: var(--accent); z-index: 300; transform: translateY(100%); pointer-events: none; transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1); }
         #page-curtain.active { transform: translateY(0%); }
 
-        #cart-sidebar { position: fixed; right: 0; top: 0; height: 100%; width: 100%; max-width: 400px; z-index: 400; transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        #cart-sidebar { 
+            position: fixed; 
+            right: 0; 
+            top: 0; 
+            height: 100%; 
+            width: 100%; 
+            max-width: 400px; 
+            z-index: 400; 
+            transform: translateX(100%); 
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            touch-action: pan-y; /* Allow vertical scroll but handle horizontal swipes via JS */
+        }
         
+        #cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 399;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #cart-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .logo-box {
             width: 56px;
             height: 56px;
@@ -183,6 +208,7 @@
 <body>
 
     <div id="page-curtain"></div>
+    <div id="cart-overlay" onclick="toggleCart(false)"></div>
 
     <button id="theme-btn" class="theme-toggle-fixed glass text-xl">🌓</button>
 
@@ -214,7 +240,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 flex-1">
-                <button onclick="toggleCart()" class="bg-white/5 px-3 py-2 rounded-full border border-white/10 flex items-center gap-2">
+                <button onclick="toggleCart(true)" class="bg-white/5 px-3 py-2 rounded-full border border-white/10 flex items-center gap-2">
                     <span class="text-lg">🎒</span>
                     <span id="cart-count" class="text-[10px] font-black bg-[var(--accent)] text-black px-2 py-0.5 rounded-full">0</span>
                 </button>
@@ -222,10 +248,11 @@
         </nav>
     </div>
 
+    <!-- Cart Sidebar with Swipe Listener -->
     <div id="cart-sidebar" class="glass flex flex-col shadow-2xl">
         <div class="p-8 flex justify-between items-center border-b border-white/5">
             <h2 class="classy-font text-3xl font-black uppercase">Your Bag</h2>
-            <button onclick="toggleCart()" class="text-4xl opacity-50">&times;</button>
+            <button onclick="toggleCart(false)" class="text-4xl opacity-50">&times;</button>
         </div>
         <div id="cart-items" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
         <div class="p-8 border-t border-white/5 m-4 glass rounded-[32px]">
@@ -235,6 +262,8 @@
             </div>
             <button class="w-full bg-[var(--accent)] text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest" onclick="showCheckout()">Proceed to Checkout</button>
         </div>
+        <!-- Help hint for mobile -->
+        <div class="text-center pb-4 opacity-20 text-[8px] tracking-[0.3em] uppercase sm:hidden">Swipe right to close</div>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 z-[500] hidden bg-black/90 backdrop-blur-xl items-center justify-center p-6">
@@ -319,52 +348,45 @@
         const INSTAGRAM = "_darren.kc";
         
         const products = [
-            { 
-                id: 1, 
-                name: 'Onyx Black', 
-                price: 400, 
-                color: 'bg-zinc-900', 
-                images: [], 
-                icons: ['🩲', '🖤', '🎱'], 
-                category: 'Signature Series' 
-            },
-            { 
-                id: 2, 
-                name: 'Dark Grey', 
-                price: 400, 
-                color: 'bg-neutral-800', 
-                images: [], 
-                icons: ['🩲', '🌑', '🌪️'], 
-                category: 'Urban Series' 
-            },
-            { 
-                id: 3, 
-                name: 'Slate Grey', 
-                price: 400, 
-                color: 'bg-zinc-600', 
-                images: [], 
-                icons: ['🩲', '🔘', '⛰️'], 
-                category: 'Urban Series' 
-            },
-            { 
-                id: 4, 
-                name: 'Navy Blue', 
-                price: 400, 
-                color: 'bg-blue-950', 
-                images: [], 
-                icons: ['🩲', '🌊', '🧿'], 
-                category: 'Deep Sea Edition' 
-            }
+            { id: 1, name: 'Onyx Black', price: 400, color: 'bg-zinc-900', icons: ['🩲', '🖤', '🎱'], category: 'Signature Series' },
+            { id: 2, name: 'Dark Grey', price: 400, color: 'bg-neutral-800', icons: ['🩲', '🌑', '🌪️'], category: 'Urban Series' },
+            { id: 3, name: 'Slate Grey', price: 400, color: 'bg-zinc-600', icons: ['🩲', '🔘', '⛰️'], category: 'Urban Series' },
+            { id: 4, name: 'Navy Blue', price: 400, color: 'bg-blue-950', icons: ['🩲', '🌊', '🧿'], category: 'Deep Sea Edition' }
         ];
 
         let cart = [];
 
+        // Swipe Management
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const cartSidebar = document.getElementById('cart-sidebar');
+
+        cartSidebar.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        cartSidebar.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            // If user swipes right (away from center of screen on a right-aligned sidebar)
+            if (touchEndX > touchStartX + 60) {
+                toggleCart(false);
+            }
+        }
+
         function navigateTo(pageId) {
+            toggleCart(false);
+            closeCheckout();
+
             const curtain = document.getElementById('page-curtain');
             curtain.classList.add('active');
             setTimeout(() => {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`page-${pageId}`).classList.remove('hidden');
+                const target = document.getElementById(`page-${pageId}`);
+                if(target) target.classList.remove('hidden');
                 if(pageId === 'shop') renderShop();
                 window.scrollTo(0,0);
                 curtain.classList.remove('active');
@@ -372,18 +394,29 @@
             }, 600);
         }
 
-        function toggleCart() {
+        function toggleCart(forceOpen = null) {
             const side = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
             const isOpen = side.style.transform === 'translateX(0%)';
-            side.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0%)';
+            
+            const shouldOpen = forceOpen !== null ? forceOpen : !isOpen;
+
+            if (shouldOpen) {
+                side.style.transform = 'translateX(0%)';
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent page scroll
+            } else {
+                side.style.transform = 'translateX(100%)';
+                overlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scroll
+            }
         }
 
         function renderShop() {
             const grid = document.getElementById('catalog-grid');
+            if(!grid) return;
             grid.innerHTML = products.map(p => {
-                const hasImages = p.images && p.images.length > 0;
-                const slideItems = hasImages ? p.images : p.icons;
-
+                const slideItems = p.icons;
                 return `
                 <div class="glass p-8 rounded-[50px] flex flex-col reveal reveal-bottom">
                     <span class="text-[8px] font-black uppercase tracking-widest opacity-40 mb-4">${p.category}</span>
@@ -391,10 +424,7 @@
                         <div class="carousel-track" id="track-${p.id}">
                             ${slideItems.map(item => `
                                 <div class="carousel-item">
-                                    ${hasImages 
-                                        ? `<img src="${item}" class="carousel-img" alt="${p.name}">`
-                                        : `<span class="text-7xl floating-icon">${item}</span>`
-                                    }
+                                    <span class="text-7xl floating-icon">${item}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -418,10 +448,9 @@
             `}).join('');
 
             products.forEach(p => {
-                const slideCount = (p.images && p.images.length > 0) ? p.images.length : p.icons.length;
                 let current = 0;
                 setInterval(() => {
-                    current = (current + 1) % slideCount;
+                    current = (current + 1) % p.icons.length;
                     const track = document.getElementById(`track-${p.id}`);
                     if(track) track.style.transform = `translateX(-${current * 100}%)`;
                 }, 3000 + Math.random() * 2000);
@@ -455,7 +484,7 @@
             const product = products.find(p => p.id === id);
             for(let i=0; i<qty; i++) cart.push({ ...product, size });
             updateCart();
-            toggleCart();
+            toggleCart(true);
         }
 
         function updateCart() {
@@ -481,8 +510,11 @@
         }
 
         function removeFromCart(name, size) {
-            cart = cart.filter(i => !(i.name === name && i.size === size));
-            updateCart();
+            const index = cart.findIndex(i => i.name === name && i.size === size);
+            if(index > -1) {
+                cart.splice(index, 1);
+                updateCart();
+            }
         }
 
         function showCheckout() { if(cart.length > 0) document.getElementById('checkout-modal').classList.replace('hidden', 'flex'); }
@@ -497,7 +529,7 @@
                 return acc;
             }, {});
 
-            let msg = `✨ NEW ORDER: KCM PREMIUM BOUTIQUE\n`;
+            let msg = `✨ NEW ORDER: KCM ORIGINALS\n`;
             msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
             
             let i = 1;
@@ -510,18 +542,28 @@
             });
 
             msg += `━━━━━━━━━━━━━━━━━━━━\n`;
-            msg += `💰 TOTAL AMOUNT: KSh ${total.toLocaleString()}\n\n`;
-            msg += `📝 CUSTOMER NOTE: I'd like to place this order. Please advise on payment and delivery.\n`;
+            msg += `💰 TOTAL AMOUNT: KSh ${total.toLocaleString()}\n`;
+
+            const encodedMsg = encodeURIComponent(msg);
+            
+            const resetApp = () => {
+                cart = [];
+                updateCart();
+                closeCheckout();
+                toggleCart(false);
+            };
 
             if(platform === 'whatsapp') {
-                window.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+                resetApp();
+                window.open(`https://wa.me/${WHATSAPP}?text=${encodedMsg}`, '_blank');
             } else {
                 const dummy = document.createElement("textarea");
                 document.body.appendChild(dummy);
                 dummy.value = msg; dummy.select();
                 document.execCommand("copy");
                 document.body.removeChild(dummy);
-                window.location.href = `https://instagram.com/${INSTAGRAM}`;
+                resetApp();
+                window.open(`https://instagram.com/${INSTAGRAM}`, '_blank');
             }
         }
 
@@ -537,7 +579,10 @@
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         };
 
-        window.onload = initReveals;
+        window.onload = () => {
+            initReveals();
+            updateCart();
+        };
     </script>
 </body>
 </html>
