@@ -7,35 +7,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,400;1,900&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #b2945e;
             --accent-glow: rgba(178, 148, 94, 0.4);
             --transition-speed: 0.8s;
-            --curve: 40px;
         }
 
         [data-theme="dark"] {
             --bg: #050505;
             --text: #ffffff;
-            --nav-text: #ffffff;
-            --glass: rgba(20, 20, 20, 0.85);
+            --hero-text: #ffffff;
+            --glass: rgba(20, 20, 20, 0.75);
             --card-border: rgba(255, 255, 255, 0.08);
             --qty-bg: rgba(255, 255, 255, 0.05);
-            --logo-filter: invert(1);
-            --logo-bg: rgba(255, 255, 255, 0.05);
+            --logo-filter: invert(0);
         }
 
         [data-theme="light"] {
             --bg: #f2f2f7;
-            --text: #1c1c1e;
-            --nav-text: #000000;
-            --glass: rgba(255, 255, 255, 0.85);
+            --text: #2c2c2e; 
+            --hero-text: #1c1c1e;
+            --glass: rgba(255, 255, 255, 0.75);
             --card-border: rgba(0, 0, 0, 0.1);
             --qty-bg: rgba(0, 0, 0, 0.05);
-            --logo-filter: none;
-            --logo-bg: rgba(0, 0, 0, 0.03);
+            --logo-filter: invert(1);
         }
 
         body {
@@ -44,8 +41,8 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             overflow-x: hidden;
-            transition: background-color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         .glass {
@@ -54,34 +51,7 @@
             border: 1px solid var(--card-border);
         }
 
-        .nav-logo-img {
-            height: 32px;
-            width: auto;
-            object-fit: contain;
-            filter: var(--logo-filter);
-            transition: filter 0.3s ease;
-        }
-
-        @media (min-width: 768px) {
-            .nav-logo-img { height: 48px; }
-        }
-
-        /* Page Transition Curtain */
-        #page-curtain {
-            position: fixed;
-            inset: 0;
-            background: var(--accent);
-            z-index: 300;
-            transform: translateY(100%);
-            pointer-events: none;
-            transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
-        }
-        #page-curtain.active {
-            transform: translateY(0%);
-        }
-        #page-curtain.exit {
-            transform: translateY(-100%);
-        }
+        .classy-font { font-family: 'Playfair Display', serif; font-style: italic; }
 
         .hero-fullscreen {
             min-height: 100vh;
@@ -89,350 +59,321 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 80px 20px;
+            align-items: center;
             overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .fit-screen-text { font-size: 10vw; display: block; width: 100%; text-align: center; line-height: 1; }
+            .brand-giant-text { font-size: 25vw; line-height: 0.8; }
+            .hero-content { padding-bottom: 5rem; }
+        }
+
+        @media (min-width: 641px) {
+            .fit-screen-text { font-size: 4rem; line-height: 1; letter-spacing: 0.2em; }
+            .brand-giant-text { font-size: 16rem; line-height: 0.8; }
         }
 
         .hero-bg {
             position: absolute;
             inset: 0;
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.9)), url('Gemini_Generated_Image_w0f6itw0f6itw0f6.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            transform: scale(1.1);
-            animation: hero-zoom 20s infinite alternate;
-        }
-
-        @keyframes hero-zoom {
-            from { transform: scale(1); }
-            to { transform: scale(1.15); }
-        }
-
-        .product-card {
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-        }
-
-        .carousel-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 24px;
-            touch-action: pan-y;
-        }
-
-        .carousel-track {
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .carousel-item {
-            min-width: 100%;
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* Insane Icon Animation */
-        .floating-icon {
-            animation: float-silk 6s ease-in-out infinite;
-        }
-
-        @keyframes float-silk {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        .qty-selector {
-            display: flex;
-            align-items: center;
-            background: var(--qty-bg);
-            border-radius: 99px;
-            padding: 4px;
-            gap: 8px;
-        }
-        
-        .qty-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: var(--bg);
-            border: 1px solid var(--card-border);
-            font-weight: bold;
-            font-size: 14px;
-            transition: transform 0.2s;
+            z-index: -1;
         }
 
-        .qty-btn:active { transform: scale(0.9); }
-
-        #cart-sidebar {
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            max-width: 400px;
-            z-index: 400;
-            transform: translateX(100%);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+        .hero-content {
+            color: var(--hero-text);
         }
-
-        .reveal {
-            opacity: 0;
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-bottom { transform: translateY(60px); }
-        .reveal.active { opacity: 1; transform: translate(0, 0); }
 
         .gold-gradient-text {
-            background: linear-gradient(135deg, #e2c275 0%, #b2945e 50%, #8c713d 100%);
+            background: linear-gradient(135deg, #f3e5ab 0%, #b2945e 50%, #8c713d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
         }
 
-        .size-chip {
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--card-border);
-            padding: 10px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            transition: all 0.3s;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .size-chip.selected {
-            background: var(--accent);
-            color: black;
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(178, 148, 94, 0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
             border-color: var(--accent);
-            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
+        .feature-card:hover::before { opacity: 1; }
 
-        .btn-premium {
-            background: var(--accent);
-            color: black;
-            box-shadow: 0 10px 20px var(--accent-glow);
-            transition: all 0.3s;
-        }
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px var(--accent-glow);
-        }
+        .carousel-container { position: relative; overflow: hidden; border-radius: 30px; }
+        .carousel-track { display: flex; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .carousel-item { min-width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+        .carousel-img { width: 100%; height: 100%; object-fit: cover; }
+        .floating-icon { animation: float-silk 6s ease-in-out infinite; }
+        @keyframes float-silk { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        .btn-soon {
-            border: 1px solid var(--accent);
-            background: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 0 15px var(--accent-glow);
-            animation: pulse-gold 2s infinite;
+        .qty-selector { display: flex; align-items: center; background: var(--qty-bg); border-radius: 99px; padding: 4px; gap: 8px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--card-border); font-weight: bold; font-size: 14px; color: var(--text); }
+        .size-chip { border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; flex: 1; text-align: center; transition: 0.3s; }
+        .size-chip.selected { background: var(--accent); color: black; border-color: var(--accent); }
+
+        .nav-container { position: fixed; left: 50%; transform: translateX(-50%); z-index: 250; width: 92%; max-width: 900px; }
+        @media (min-width: 641px) { .nav-container { top: 24px; } }
+        @media (max-width: 640px) { .nav-container { bottom: 24px; } }
+
+        .reveal { opacity: 0; transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-bottom { transform: translateY(40px); }
+        .reveal.active { opacity: 1; transform: translate(0, 0); }
+
+        #page-curtain { position: fixed; inset: 0; background: var(--accent); z-index: 300; transform: translateY(100%); pointer-events: none; transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1); }
+        #page-curtain.active { transform: translateY(0%); }
+
+        #cart-sidebar { position: fixed; right: 0; top: 0; height: 100%; width: 100%; max-width: 400px; z-index: 400; transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .logo-box {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            overflow: hidden;
+            background: transparent;
+        }
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: var(--logo-filter);
+            transition: filter 0.5s ease;
         }
         
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 5px var(--accent-glow); opacity: 0.8; }
-            50% { box-shadow: 0 0 25px var(--accent-glow); opacity: 1; }
-            100% { box-shadow: 0 0 5px var(--accent-glow); opacity: 0.8; }
-        }
-
-        /* Responsive Nav logic */
-        .nav-container {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 250;
-            width: 92%;
-            max-width: 900px;
-        }
-
-        @media (min-width: 641px) {
-            .nav-container { top: 24px; }
-        }
-
         @media (max-width: 640px) {
-            .nav-container { bottom: 24px; }
-            .hero-fullscreen h1 { font-size: 4rem; line-height: 0.85; }
-            .product-grid { grid-template-columns: 1fr; }
-            .nav-pill { padding: 8px 16px; }
+            .mobile-logo-fixed {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 500;
+            }
+        }
+
+        .theme-toggle-fixed {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 500;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- PAGE TRANSITION CURTAIN -->
     <div id="page-curtain"></div>
 
-    <!-- NAVIGATION -->
+    <button id="theme-btn" class="theme-toggle-fixed glass text-xl">🌓</button>
+
+    <div class="sm:hidden mobile-logo-fixed cursor-pointer" onclick="navigateTo('home')">
+        <div class="logo-box">
+            <img src="https://lh3.googleusercontent.com/u/0/d/19d7lO8GZpANplJS83oxzWjMmhy_IuGKK" alt="KCM Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="classy-font font-black gold-gradient-text text-3xl italic hidden">K</span>
+        </div>
+    </div>
+
     <div class="nav-container">
-        <nav class="glass rounded-full px-4 sm:px-6 py-3 flex justify-between items-center nav-pill relative">
-            <!-- Desktop Logo Left -->
-            <div class="hidden sm:flex items-center cursor-pointer group flex-1" onclick="navigateTo('home')">
-                <img src="https://lh3.googleusercontent.com/u/0/d/19d7lO8GZpANplJS83oxzWjMmhy_IuGKK" alt="KCM Logo" class="nav-logo-img group-hover:scale-105 transition">
+        <nav class="glass rounded-full px-4 py-3 flex justify-between items-center relative overflow-visible">
+            <div class="hidden sm:flex items-center flex-1 justify-start cursor-pointer" onclick="navigateTo('home')">
+                <div class="logo-box">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/19d7lO8GZpANplJS83oxzWjMmhy_IuGKK" alt="KCM Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <span class="classy-font font-black gold-gradient-text text-2xl italic hidden">K</span>
+                </div>
             </div>
 
-            <!-- Mobile Logo (Center) -->
-            <div class="sm:hidden absolute left-1/2 -translate-x-1/2">
-                <img src="https://lh3.googleusercontent.com/u/0/d/19d7lO8GZpANplJS83oxzWjMmhy_IuGKK" alt="KCM Logo" class="h-8 w-auto filter invert brightness-200">
-            </div>
-            
-            <!-- Mobile Navigation (Left Side) -->
-            <div class="sm:hidden flex items-center gap-4 flex-1">
-                <button onclick="navigateTo('home')" class="text-xl p-2 active:scale-90 transition">🏠</button>
-                <button onclick="navigateTo('shop')" class="text-xl p-2 active:scale-90 transition">🛍️</button>
-            </div>
-            
-            <!-- Desktop Navigation (Center) -->
-            <div class="hidden sm:flex items-center justify-center gap-10 font-bold text-[11px] tracking-widest uppercase flex-1">
+            <div class="hidden sm:flex items-center justify-center gap-10 font-bold text-[10px] tracking-widest uppercase flex-1">
                 <button onclick="navigateTo('home')" class="hover:text-[var(--accent)] transition">Home</button>
                 <button onclick="navigateTo('shop')" class="hover:text-[var(--accent)] transition">Shop</button>
+                <button onclick="navigateTo('tees')" class="hover:text-[var(--accent)] transition text-[var(--accent)]">Tees: Soon</button>
             </div>
-            
-            <!-- Actions (Right Side) -->
-            <div class="flex items-center justify-end gap-3 sm:gap-6 flex-1">
-                <button id="theme-btn" class="text-lg p-1 hover:rotate-12 transition">🌓</button>
-                
-                <button onclick="toggleCart()" class="flex items-center gap-2 sm:gap-3 bg-white/5 px-3 sm:px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition">
-                    <span class="text-base sm:text-lg">🎒</span>
+
+            <div class="sm:hidden flex items-center gap-2">
+                <button onclick="navigateTo('home')" class="p-2 text-xl">🏠</button>
+                <button onclick="navigateTo('shop')" class="p-2 text-xl">🛍️</button>
+            </div>
+
+            <div class="flex items-center justify-end gap-4 flex-1">
+                <button onclick="toggleCart()" class="bg-white/5 px-3 py-2 rounded-full border border-white/10 flex items-center gap-2">
+                    <span class="text-lg">🎒</span>
                     <span id="cart-count" class="text-[10px] font-black bg-[var(--accent)] text-black px-2 py-0.5 rounded-full">0</span>
                 </button>
             </div>
         </nav>
     </div>
 
-    <!-- CART SIDEBAR -->
-    <div id="cart-sidebar" class="glass flex flex-col">
-        <div class="p-8 flex justify-between items-center border-b border-black/5 dark:border-white/5">
-            <h2 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h2>
-            <button onclick="toggleCart()" class="text-4xl opacity-50 hover:opacity-100">&times;</button>
+    <div id="cart-sidebar" class="glass flex flex-col shadow-2xl">
+        <div class="p-8 flex justify-between items-center border-b border-white/5">
+            <h2 class="classy-font text-3xl font-black uppercase">Your Bag</h2>
+            <button onclick="toggleCart()" class="text-4xl opacity-50">&times;</button>
         </div>
         <div id="cart-items" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
-        <div class="p-8 border-t border-black/5 dark:border-white/5 glass m-4 rounded-[32px]">
+        <div class="p-8 border-t border-white/5 m-4 glass rounded-[32px]">
             <div class="flex justify-between items-center mb-6">
-                <span class="opacity-40 text-[11px] uppercase font-bold tracking-[0.2em]">Subtotal</span>
+                <span class="opacity-40 text-[10px] font-bold uppercase tracking-widest">Subtotal</span>
                 <span id="cart-total" class="font-black text-2xl gold-gradient-text">KSh 0</span>
             </div>
-            <button class="w-full btn-premium py-5 rounded-2xl font-black uppercase tracking-widest text-xs" onclick="showCheckout()">Proceed to Checkout</button>
+            <button class="w-full bg-[var(--accent)] text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest" onclick="showCheckout()">Proceed to Checkout</button>
         </div>
     </div>
 
-    <!-- CHECKOUT MODAL -->
     <div id="checkout-modal" class="fixed inset-0 z-[500] hidden bg-black/90 backdrop-blur-xl items-center justify-center p-6">
-        <div class="glass p-10 rounded-[50px] max-w-sm w-full relative border-t-4 border-[var(--accent)]">
+        <div class="glass p-10 rounded-[50px] max-w-sm w-full relative">
             <button onclick="closeCheckout()" class="absolute top-8 right-8 text-3xl opacity-50">&times;</button>
-            <h3 class="text-3xl font-black uppercase italic mb-2 text-center">Checkout</h3>
-            <p class="text-[10px] text-center opacity-40 uppercase tracking-widest mb-10">Select your preferred platform</p>
+            <h3 class="classy-font text-3xl font-black uppercase italic mb-8 text-center">Checkout</h3>
             <div class="space-y-4">
-                <button onclick="checkout('whatsapp')" class="w-full bg-emerald-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition">WhatsApp Merchant</button>
-                <button onclick="checkout('instagram')" class="w-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition text-sm">Instagram DM (Details Copied)</button>
+                <button onclick="checkout('whatsapp')" class="w-full bg-emerald-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3">WhatsApp Merchant</button>
+                <button onclick="checkout('instagram')" class="w-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3">Instagram DM</button>
             </div>
         </div>
     </div>
 
-    <!-- HOME PAGE -->
     <main id="page-home" class="page-content active">
         <section class="hero-fullscreen">
             <div class="hero-bg"></div>
-            <div class="relative z-10 text-center text-white px-4">
+            <div class="hero-content relative z-10 text-center px-6">
                 <div class="reveal reveal-bottom active">
-                    <h1 class="text-6xl sm:text-8xl md:text-[10rem] font-black tracking-tighter italic uppercase leading-[0.8] mb-6">
-                        KCM <br><span class="gold-gradient-text">Originals</span>
+                    <h1 class="classy-font font-black tracking-tighter uppercase mb-4">
+                        <span class="brand-giant-text block mb-4">KCM</span>
+                        <span class="gold-gradient-text fit-screen-text italic">ORIGINALS</span>
                     </h1>
                 </div>
                 <div class="reveal reveal-bottom active" style="transition-delay: 0.2s">
-                    <p class="text-[10px] sm:text-xs tracking-[0.5em] uppercase opacity-60 mb-12 leading-relaxed">
-                        Precision Engineering • Silk-Flex™ Technology • KSh 400
+                    <p class="text-[11px] sm:text-[13px] tracking-[0.6em] uppercase opacity-80 mb-12 mt-4 max-w-md mx-auto leading-relaxed">
+                        Redefining the standard of daily luxury for the modern elite.
                     </p>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 reveal reveal-bottom active" style="transition-delay: 0.4s">
-                    <button onclick="navigateTo('shop')" class="w-full sm:w-auto px-14 py-6 bg-[var(--accent)] text-black rounded-full font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-[var(--accent-glow)]">Shop Essentials</button>
-                    <button class="btn-soon w-full sm:w-auto px-14 py-6 rounded-full text-[var(--accent)] font-black uppercase tracking-[0.2em] text-[11px]">View Next Drop</button>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6 reveal reveal-bottom active" style="transition-delay: 0.4s">
+                    <button onclick="navigateTo('shop')" class="w-full sm:w-auto px-16 py-6 bg-[var(--accent)] text-black rounded-full font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[var(--accent-glow)] hover:scale-105 transition active:scale-95">Shop Collection</button>
+                    <button onclick="navigateTo('tees')" class="w-full sm:w-auto px-16 py-6 border border-current opacity-40 hover:opacity-100 rounded-full font-black uppercase tracking-widest text-[10px] transition">Tees: Soon</button>
                 </div>
             </div>
         </section>
 
-        <!-- CARDS -->
         <section class="py-32 px-6 max-w-7xl mx-auto mb-20">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass p-10 rounded-[45px] reveal reveal-bottom group hover:border-[var(--accent)] transition">
-                    <div class="text-4xl mb-6">🧵</div>
-                    <h4 class="text-2xl font-black uppercase italic mb-4">Silk-Flex™</h4>
-                    <p class="text-sm opacity-50 leading-loose">Proprietary blend of micro-fibers designed for a second-skin feel that never loses its shape, even after heavy wear.</p>
+            <div class="text-center mb-24 reveal reveal-bottom">
+                <span class="text-[var(--accent)] text-[10px] font-black uppercase tracking-[0.5em] block mb-4">Technical Prowess</span>
+                <h2 class="classy-font text-5xl md:text-7xl font-black uppercase leading-none">The Blueprint<br>Of Comfort</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="feature-card p-12 rounded-[50px] reveal reveal-bottom">
+                    <div class="text-5xl mb-8">🤌</div>
+                    <h4 class="classy-font text-3xl font-black uppercase mb-6">Silk-Flex™</h4>
+                    <p class="text-sm opacity-50 leading-loose">Developed in Italian labs, our unique micro-fiber composite offers 4-way stretch that never loses its original architecture, feeling like a second skin.</p>
                 </div>
-                <div class="glass p-10 rounded-[45px] reveal reveal-bottom group hover:border-[var(--accent)] transition" style="transition-delay: 0.1s">
-                    <div class="text-4xl mb-6">📐</div>
-                    <h4 class="text-2xl font-black uppercase italic mb-4">Anatomical Fit</h4>
-                    <p class="text-sm opacity-50 leading-loose">Engineered with precision cutting to ensure zero bunching and a flush profile under denim or trousers.</p>
+                <div class="feature-card p-12 rounded-[50px] reveal reveal-bottom" style="transition-delay: 0.1s">
+                    <div class="text-5xl mb-8">📐</div>
+                    <h4 class="classy-font text-3xl font-black uppercase mb-6">Anatomical</h4>
+                    <p class="text-sm opacity-50 leading-loose">Precision contoured mapping ensures zero friction in high-movement areas. Designed to sit perfectly under any garment from suits to gym wear.</p>
                 </div>
-                <div class="glass p-10 rounded-[45px] reveal reveal-bottom group hover:border-[var(--accent)] transition" style="transition-delay: 0.2s">
-                    <div class="text-4xl mb-6">🌬️</div>
-                    <h4 class="text-2xl font-black uppercase italic mb-4">Active-Air</h4>
-                    <p class="text-sm opacity-50 leading-loose">Micro-perforated cooling zones allow for 360-degree breathability, keeping you fresh during high-intensity days.</p>
+                <div class="feature-card p-12 rounded-[50px] reveal reveal-bottom" style="transition-delay: 0.2s">
+                    <div class="text-5xl mb-8">💨</div>
+                    <h4 class="classy-font text-3xl font-black uppercase mb-6">Active-Air</h4>
+                    <p class="text-sm opacity-50 leading-loose">Patented moisture-wicking technology keeps you 3°C cooler than cotton. Anti-microbial silver ions infused into the weave for lifelong freshness.</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- SHOP PAGE -->
-    <main id="page-shop" class="page-content hidden pt-24 sm:pt-40 pb-32 px-6">
+    <main id="page-shop" class="page-content hidden pt-32 pb-32 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-20 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h2 class="text-5xl md:text-7xl font-black uppercase italic tracking-tighter gold-gradient-text leading-none">The Collection</h2>
-                    <p class="opacity-40 text-[11px] tracking-[0.4em] uppercase mt-4">Signature Silk-Flex™ Essentials • Premium Basics • KSh 400</p>
-                </div>
-                <div class="h-[2px] flex-1 bg-white/5 mx-10 hidden md:block mb-4"></div>
-                <div class="text-[10px] font-bold uppercase tracking-widest opacity-30">Spring V.1.0 Drop</div>
+            <div class="mb-20 text-center">
+                <span class="text-[var(--accent)] text-[10px] font-black uppercase tracking-[0.5em] block mb-4">Curated Selection</span>
+                <h2 class="classy-font text-6xl md:text-9xl font-black uppercase gold-gradient-text">Catalog</h2>
+                <p class="text-xs opacity-40 mt-6 tracking-widest uppercase">Every piece is inspected for 100% precision</p>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10" id="catalog-grid"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="catalog-grid"></div>
+        </div>
+    </main>
+
+    <main id="page-tees" class="page-content hidden h-screen flex items-center justify-center p-6 text-center">
+        <div>
+            <h2 class="classy-font text-7xl md:text-9xl font-black uppercase gold-gradient-text mb-4">Coming Soon</h2>
+            <p class="text-[var(--accent)] font-black uppercase tracking-[0.8em] text-xs">The Tees Collection • Summer 2024</p>
+            <button onclick="navigateTo('home')" class="mt-12 px-10 py-4 border border-current opacity-40 hover:opacity-100 rounded-full font-black uppercase text-[10px] tracking-widest transition">Return to Home</button>
         </div>
     </main>
 
     <script>
         const WHATSAPP = "254704336717";
         const INSTAGRAM = "_darren.kc";
+        
+        /**
+         * Updated Products Array
+         * Use 'images' array for JPG/PNG URLs.
+         * Keep 'icons' as fallback for when no images are present.
+         */
         const products = [
-            { id: 1, name: 'Onyx Black', price: 400, color: 'bg-zinc-900', icons: ['🩲', '🖤', '🎱'] },
-            { id: 2, name: 'Dark Grey', price: 400, color: 'bg-neutral-800', icons: ['🩲', '🌑', '🌪️'] },
-            { id: 3, name: 'Slate Grey', price: 400, color: 'bg-zinc-600', icons: ['🩲', '🔘', '⛰️'] },
-            { id: 4, name: 'Navy Blue', price: 400, color: 'bg-blue-950', icons: ['🩲', '🌊', '🧿'] }
+            { 
+                id: 1, 
+                name: 'Onyx Black', 
+                price: 400, 
+                color: 'bg-zinc-900', 
+                images: [], // Add URLs here e.g. ["url1.jpg", "url2.jpg"]
+                icons: ['🩲', '🖤', '🎱'], 
+                category: 'Signature Series' 
+            },
+            { 
+                id: 2, 
+                name: 'Dark Grey', 
+                price: 400, 
+                color: 'bg-neutral-800', 
+                images: [], 
+                icons: ['🩲', '🌑', '🌪️'], 
+                category: 'Urban Series' 
+            },
+            { 
+                id: 3, 
+                name: 'Slate Grey', 
+                price: 400, 
+                color: 'bg-zinc-600', 
+                images: [], 
+                icons: ['🩲', '🔘', '⛰️'], 
+                category: 'Urban Series' 
+            },
+            { 
+                id: 4, 
+                name: 'Navy Blue', 
+                price: 400, 
+                color: 'bg-blue-950', 
+                images: [], 
+                icons: ['🩲', '🌊', '🧿'], 
+                category: 'Deep Sea Edition' 
+            }
         ];
 
         let cart = [];
-        let isTransitioning = false;
 
         function navigateTo(pageId) {
-            if (isTransitioning) return;
-            isTransitioning = true;
-
             const curtain = document.getElementById('page-curtain');
-            curtain.classList.remove('exit');
             curtain.classList.add('active');
-
             setTimeout(() => {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
                 document.getElementById(`page-${pageId}`).classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'auto' });
-                
                 if(pageId === 'shop') renderShop();
-
+                window.scrollTo(0,0);
                 curtain.classList.remove('active');
-                curtain.classList.add('exit');
-                
-                setTimeout(() => {
-                    curtain.classList.remove('exit');
-                    isTransitioning = false;
-                    initReveals();
-                }, 600);
+                initReveals();
             }, 600);
         }
 
@@ -442,31 +383,30 @@
             side.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0%)';
         }
 
-        function showCheckout() {
-            if(cart.length === 0) return;
-            document.getElementById('checkout-modal').classList.replace('hidden', 'flex');
-        }
-
-        function closeCheckout() {
-            document.getElementById('checkout-modal').classList.replace('flex', 'hidden');
-        }
-
         function renderShop() {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = products.map(p => `
-                <div class="glass p-8 rounded-[50px] flex flex-col product-card reveal reveal-bottom">
-                    <div class="carousel-container mb-8 ${p.color} aspect-square shadow-2xl flex items-center justify-center overflow-hidden">
+            grid.innerHTML = products.map(p => {
+                const hasImages = p.images && p.images.length > 0;
+                const slideItems = hasImages ? p.images : p.icons;
+
+                return `
+                <div class="glass p-8 rounded-[50px] flex flex-col reveal reveal-bottom">
+                    <span class="text-[8px] font-black uppercase tracking-widest opacity-40 mb-4">${p.category}</span>
+                    <div class="carousel-container mb-8 ${p.color}">
                         <div class="carousel-track" id="track-${p.id}">
-                            ${p.icons.map(icon => `
+                            ${slideItems.map(item => `
                                 <div class="carousel-item">
-                                    <span class="text-7xl floating-icon">${icon}</span>
+                                    ${hasImages 
+                                        ? `<img src="${item}" class="carousel-img" alt="${p.name}">`
+                                        : `<span class="text-7xl floating-icon">${item}</span>`
+                                    }
                                 </div>
                             `).join('')}
                         </div>
                     </div>
                     <div class="flex justify-between items-start mb-6">
                         <div>
-                            <h3 class="text-xl font-black uppercase italic tracking-tighter">${p.name}</h3>
+                            <h3 class="classy-font text-2xl font-black uppercase">${p.name}</h3>
                             <p class="gold-gradient-text font-black text-sm">KSh ${p.price}</p>
                         </div>
                         <div class="qty-selector">
@@ -475,18 +415,18 @@
                             <button class="qty-btn" onclick="updateQty(${p.id}, 1)">+</button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-5 gap-2 mb-8" id="sizes-${p.id}">
+                    <div class="grid grid-cols-5 gap-1 mb-8" id="sizes-${p.id}">
                         ${['S','M','L','XL','XXL'].map(s => `<div class="size-chip" onclick="selectSize(${p.id}, '${s}', this)">${s}</div>`).join('')}
                     </div>
-                    <button id="add-${p.id}" onclick="addToCart(${p.id})" class="w-full bg-black text-white dark:bg-white dark:text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] mt-auto shadow-xl">Add to Bag</button>
+                    <button id="add-${p.id}" onclick="addToCart(${p.id})" class="w-full bg-white/10 dark:bg-white/90 dark:text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[var(--accent)] hover:text-black transition active:scale-95">Add to Bag</button>
                 </div>
-            `).join('');
-            
-            // Start the auto-carousel for each card
+            `}).join('');
+
             products.forEach(p => {
+                const slideCount = (p.images && p.images.length > 0) ? p.images.length : p.icons.length;
                 let current = 0;
                 setInterval(() => {
-                    current = (current + 1) % p.icons.length;
+                    current = (current + 1) % slideCount;
                     const track = document.getElementById(`track-${p.id}`);
                     if(track) track.style.transform = `translateX(-${current * 100}%)`;
                 }, 3000 + Math.random() * 2000);
@@ -509,10 +449,10 @@
             const size = btn.dataset.size;
             if(!size) {
                 btn.innerText = "SELECT SIZE";
-                btn.style.backgroundColor = "#ff4444";
+                btn.classList.add('bg-red-900/20');
                 setTimeout(() => {
                     btn.innerText = "ADD TO BAG";
-                    btn.style.backgroundColor = "";
+                    btn.classList.remove('bg-red-900/20');
                 }, 1000);
                 return;
             }
@@ -526,24 +466,21 @@
         function updateCart() {
             const list = document.getElementById('cart-items');
             document.getElementById('cart-count').innerText = cart.length;
-            
             const grouped = cart.reduce((acc, item) => {
                 const key = `${item.name}-${item.size}`;
                 if(!acc[key]) acc[key] = { ...item, count: 0 };
                 acc[key].count++;
                 return acc;
             }, {});
-
             list.innerHTML = Object.values(grouped).map(i => `
                 <div class="glass p-5 rounded-3xl flex justify-between items-center border-l-4 border-[var(--accent)]">
                     <div>
-                        <p class="text-[12px] font-black uppercase tracking-tight">${i.name} [${i.size}]</p>
-                        <p class="text-[11px] opacity-40 font-bold">Qty: ${i.count} • KSh ${i.price * i.count}</p>
+                        <p class="text-[12px] font-black uppercase">${i.name} [${i.size}]</p>
+                        <p class="text-[10px] opacity-40">KSh ${i.price} × ${i.count}</p>
                     </div>
-                    <button onclick="removeFromCart('${i.name}','${i.size}')" class="text-2xl opacity-20 hover:opacity-100 transition px-3">&times;</button>
+                    <button onclick="removeFromCart('${i.name}','${i.size}')" class="text-2xl px-3 hover:text-red-500">&times;</button>
                 </div>
             `).join('');
-            
             const total = cart.reduce((s,i) => s + i.price, 0);
             document.getElementById('cart-total').innerText = `KSh ${total.toLocaleString()}`;
         }
@@ -553,34 +490,24 @@
             updateCart();
         }
 
+        function showCheckout() { if(cart.length > 0) document.getElementById('checkout-modal').classList.replace('hidden', 'flex'); }
+        function closeCheckout() { document.getElementById('checkout-modal').classList.replace('flex', 'hidden'); }
+
         function checkout(platform) {
-            let msg = "Hello KCM, I'd like to place an order! 👋\n\n";
-            msg += "✨ *KCM PREMIUM BOUTIQUE - NEW ORDER*\n";
-            msg += "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            
+            let msg = "Order from KCM Boutique:\n\n";
             const grouped = cart.reduce((acc, item) => {
                 const key = `${item.name}-${item.size}`;
                 if(!acc[key]) acc[key] = { ...item, count: 0 };
                 acc[key].count++;
                 return acc;
             }, {});
-
-            Object.values(grouped).forEach(i => {
-                msg += `🏷️ *${i.name.toUpperCase()}*\n`;
-                msg += `   └─ Size: ${i.size} | Qty: ${i.count}\n\n`;
-            });
-            
-            const total = cart.reduce((s,i) => s + i.price, 0);
-            msg += "━━━━━━━━━━━━━━━━━━━━━━\n";
-            msg += `💰 *ORDER TOTAL: KSh ${total.toLocaleString()}*`;
-            
+            Object.values(grouped).forEach(i => msg += `• ${i.name} (${i.size}) x${i.count}\n`);
             if(platform === 'whatsapp') {
                 window.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
             } else {
                 const dummy = document.createElement("textarea");
                 document.body.appendChild(dummy);
-                dummy.value = msg;
-                dummy.select();
+                dummy.value = msg; dummy.select();
                 document.execCommand("copy");
                 document.body.removeChild(dummy);
                 window.location.href = `https://instagram.com/${INSTAGRAM}`;
@@ -589,9 +516,7 @@
 
         function initReveals() {
             const obs = new IntersectionObserver(es => es.forEach(e => {
-                if(e.isIntersecting) {
-                    e.target.classList.add('active');
-                }
+                if(e.isIntersecting) e.target.classList.add('active');
             }), {threshold: 0.1});
             document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
         }
@@ -601,10 +526,7 @@
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         };
 
-        window.onload = () => {
-            initReveals();
-            updateCart();
-        };
+        window.onload = initReveals;
     </script>
 </body>
 </html>
