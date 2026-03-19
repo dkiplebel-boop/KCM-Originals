@@ -441,7 +441,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-5 gap-1 mb-8" id="sizes-${p.id}">
-                        ${['S','M','L','XL','XXL'].map(s => `<div class="size-chip" onclick="selectSize(${p.id}, '${s}', this)">${s}</div>`).join('')}
+                        ${['L','XL','XXL'].map(s => `<div class="size-chip" onclick="selectSize(${p.id}, '${s}', this)">${s}</div>`).join('')}
                     </div>
                     <button id="add-${p.id}" onclick="addToCart(${p.id})" class="w-full bg-white/10 dark:bg-white/90 dark:text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[var(--accent)] hover:text-black transition active:scale-95">Add to Bag</button>
                 </div>
